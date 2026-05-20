@@ -1309,3 +1309,37 @@ form.woocommerce-ordering {
 }
 form.woocommerce-ordering { display: none !important; }
 .woocommerce-result-count { display: none !important; }
+
+/* 水色雲間商品列表置中 */
+.woocommerce-shop .woocommerce-products-header,
+.woocommerce-shop .woocommerce-breadcrumb {
+    text-align: center !important;
+    padding-left: 0 !important;
+}
+/* sidebar 縮小到 200px */
+@media (min-width: 922px) {
+    #ts-cf-sidebar {
+        width: 200px !important;
+        border-bottom: none !important;
+    }
+    .woocommerce-shop #page .site-content,
+    .woocommerce-shop .ast-container {
+        padding-left: 200px !important;
+    }
+    .woocommerce ul.products.columns-3 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+.woocommerce ul.products li.product a img {
+    height: 280px !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+}
+
+@media (min-width: 922px) {
+    .woocommerce-shop .ast-container {
+        max-width: 1400px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
