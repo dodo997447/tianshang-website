@@ -1303,3 +1303,7 @@ ul.woocommerce-info {
         box-sizing: border-box !important;
     }
 }
+/* 隱藏 WooCommerce 原生結果數量（改用自製篩選器顯示）*/
+body.woocommerce-shop .woocommerce-result-count {
+    display: none !important;
+}
