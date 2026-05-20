@@ -1,0 +1,190 @@
+/* ============================================================
+   05-articles.css · 桃源手記、青羚報音、媒合列表、單篇文章
+   ============================================================ */
+
+/* 文章分類列表背景 */
+body.category-taoyuan, body.category-guide, body.category-stories,
+body.category-etiquette, body.category-faq,
+body.category-news, body.category-announce, body.category-update,
+body.category-rule, body.category-event,
+body.post-type-archive-matches, body.tax-region {
+    background-color: #0A0118 !important;
+}
+
+/* 共用卡片樣式 */
+body.category-taoyuan article, body.category-guide article,
+body.category-stories article, body.category-etiquette article,
+body.category-faq article, body.category-news article,
+body.category-announce article, body.category-update article,
+body.category-rule article, body.category-event article,
+body.post-type-archive-matches article,
+body.tax-region article {
+    flex: 0 0 calc((100% - 48px) / 3) !important;
+    max-width: calc((100% - 48px) / 3) !important;
+    width: calc((100% - 48px) / 3) !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: rgba(20, 10, 35, 0.85) !important;
+    border: 1px solid rgba(255, 138, 178, 0.4) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 0 12px rgba(255, 138, 178, 0.2), inset 0 0 12px rgba(200, 162, 255, 0.1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: all 0.4s ease;
+    float: none !important;
+}
+
+body.category-taoyuan article:hover, body.category-news article:hover,
+body.post-type-archive-matches article:hover, body.tax-region article:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 32px rgba(255, 138, 178, 0.45), inset 0 0 24px rgba(200, 162, 255, 0.18) !important;
+}
+
+body.category-taoyuan article *, body.category-news article *,
+body.post-type-archive-matches article *, body.tax-region article * {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* 縮圖 */
+body.category-taoyuan article .post-thumb img,
+body.category-news article .post-thumb img,
+body.post-type-archive-matches article .post-thumb img,
+body.tax-region article .post-thumb img,
+body.category-taoyuan article .ast-blog-featured-section img,
+body.category-news article .ast-blog-featured-section img,
+body.post-type-archive-matches article .ast-blog-featured-section img,
+body.tax-region article .ast-blog-featured-section img {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    display: block !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+}
+
+/* 標題 */
+body.category-taoyuan article .entry-title,
+body.category-news article .entry-title,
+body.post-type-archive-matches article .entry-title,
+body.tax-region article .entry-title,
+body.category-taoyuan article .entry-title a,
+body.category-news article .entry-title a,
+body.post-type-archive-matches article .entry-title a,
+body.tax-region article .entry-title a {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    font-family: 'Noto Serif TC', serif !important;
+    font-size: 18px !important;
+    line-height: 1.5 !important;
+    letter-spacing: 2px !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    text-shadow: 0 0 8px rgba(255, 138, 178, 0.4) !important;
+    text-decoration: none !important;
+}
+
+/* 隱藏 meta */
+body.category-taoyuan article .entry-meta,
+body.category-news article .entry-meta,
+body.post-type-archive-matches article .entry-meta,
+body.tax-region article .entry-meta,
+body.category-taoyuan article .ast-blog-meta,
+body.category-news article .ast-blog-meta,
+body.post-type-archive-matches .entry-meta,
+body.tax-region .entry-meta { display: none !important; }
+
+/* cat-links */
+body.category-taoyuan article .cat-links,
+body.category-news article .cat-links {
+    color: #FF8AB2 !important;
+    font-size: 11px !important;
+    letter-spacing: 3px !important;
+    margin: 0 0 10px !important;
+    display: block !important;
+}
+body.category-taoyuan article .cat-links a,
+body.category-news article .cat-links a { color: #FF8AB2 !important; text-decoration: none !important; }
+
+/* 摘要 */
+body.category-taoyuan article .entry-content p,
+body.category-news article .entry-content p,
+body.category-taoyuan article .entry-summary p,
+body.category-news article .entry-summary p {
+    color: rgba(224, 207, 255, 0.7) !important;
+    font-size: 12px !important;
+    line-height: 1.8 !important;
+    margin: 0 0 8px !important;
+}
+
+/* 分頁 */
+body.post-type-archive-matches .ast-pagination,
+body.post-type-archive-matches .pagination {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    margin: 32px 0 60px !important;
+    text-align: center;
+}
+
+/* RWD */
+@media (max-width: 992px) {
+    body.category-taoyuan article, body.category-news article,
+    body.post-type-archive-matches article, body.tax-region article {
+        flex: 0 0 calc((100% - 24px) / 2) !important;
+        max-width: calc((100% - 24px) / 2) !important;
+        width: calc((100% - 24px) / 2) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    body.category-taoyuan article, body.category-news article,
+    body.post-type-archive-matches article, body.tax-region article {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+}
+
+/* 單篇文章內頁 */
+.single-post .entry-title, .single-post h1.entry-title {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+    background: none !important;
+    font-family: 'Noto Serif TC', serif !important;
+    font-size: 36px !important;
+    line-height: 1.5 !important;
+    letter-spacing: 4px !important;
+    text-align: center !important;
+    margin: 40px auto 16px !important;
+    max-width: 760px;
+    text-shadow: 0 0 12px rgba(255, 138, 178, 0.5), 0 0 24px rgba(255, 59, 131, 0.3) !important;
+}
+
+.single-post .ast-author-box, .single-post .ast-author-name,
+.single-post .post-author, .single-post .posted-by,
+.single-post .author-meta, .single-post .byline,
+.single-post .vcard, .single-post .author.vcard { display: none !important; }
+
+.single-post .cat-links, .single-post .post-categories {
+    color: #FF8AB2 !important; font-size: 12px !important; letter-spacing: 4px !important;
+    text-align: center !important; display: block !important; margin-bottom: 20px !important;
+}
+.single-post .cat-links a, .single-post .post-categories a { color: #FF8AB2 !important; text-decoration: none !important; }
+
+.single-post .entry-content {
+    max-width: 720px !important; margin: 0 auto 60px !important; padding: 0 24px !important;
+    color: #E0CFFF !important; font-family: 'Noto Sans TC', sans-serif !important;
+    font-size: 16px !important; line-height: 2 !important; letter-spacing: 1.2px !important;
+}
+
+.single-post .entry-content p { color: rgba(224, 207, 255, 0.92) !important; font-size: 16px !important; line-height: 2 !important; margin: 0 0 24px !important; }
+.single-post .entry-content h2 { color: #FFFFFF !important; font-family: 'Noto Serif TC', serif !important; font-size: 24px !important; margin: 40px 0 16px !important; letter-spacing: 3px !important; padding-bottom: 8px; border-bottom: 0.5px solid rgba(255, 138, 178, 0.25); }
+.single-post .entry-content h3 { color: #FF8AB2 !important; font-size: 20px !important; letter-spacing: 3px !important; }
+.single-post .entry-content h4 { color: #C8A2FF !important; font-size: 16px !important; }
+.single-post .entry-content a { color: #FF8AB2 !important; }
+.single-post .entry-content a:hover { color: #C8A2FF !important; }
+.single-post .entry-content li { color: rgba(224, 207, 255, 0.92) !important; line-height: 2 !important; margin-bottom: 8px !important; }

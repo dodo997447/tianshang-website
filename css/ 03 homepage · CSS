@@ -1,0 +1,148 @@
+/* ============================================================
+   03-homepage.css · 首頁 ts-* 元件
+   ============================================================ */
+
+.home .entry-header, .home .entry-title,
+.page-template-default.home .entry-title { display: none !important; }
+
+.home .entry-content, .home .ast-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+}
+
+.elementor-section, .elementor-container { max-width: 1200px; margin: 0 auto; }
+
+@keyframes tsGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
+}
+
+@keyframes tsFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 24%, 55% { opacity: 0.5; }
+}
+
+@keyframes tsNeonPulse {
+    0%, 100% { text-shadow: 0 0 4px #FF8AB2, 0 0 12px #FF8AB2, 0 0 24px #FF3B83; }
+    50%       { text-shadow: 0 0 6px #C8A2FF, 0 0 16px #C8A2FF, 0 0 32px #B388FF; }
+}
+
+.ts-hero-city {
+    background: linear-gradient(180deg, #0d0520 0%, #1a0835 100%);
+    padding: 60px 20px 50px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.ts-hero-city-inner { max-width: 1100px; margin: 0 auto; }
+.ts-hero-main-title { font-size: clamp(2.5rem,6vw,4rem); color: #fff; font-weight: 700; margin: 0 0 8px; letter-spacing: .2em; }
+.ts-hero-sub { color: #ff6496; font-size: 1rem; letter-spacing: .3em; margin: 0 0 40px; }
+.ts-city-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 10px; max-width: 1100px; margin: 0 auto; }
+.ts-city-item {
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,100,150,0.2);
+    border-radius: 8px; padding: 14px 8px;
+    text-decoration: none; transition: all .2s;
+}
+.ts-city-item:hover { background: rgba(255,100,150,0.15); border-color: rgba(255,100,150,0.6); }
+.ts-city-name { color: #fff; font-size: .9rem; letter-spacing: .1em; }
+.ts-city-count { color: #ff6496; font-size: .75rem; margin-top: 4px; }
+
+.ts-section { padding: 56px 32px; color: #E0CFFF; font-family: 'Noto Sans TC', sans-serif; position: relative; box-sizing: border-box; }
+.ts-alt { background: rgba(255,255,255,0.02); }
+.ts-section-header { text-align: center; margin-bottom: 36px; }
+.ts-eyebrow { color: #FF8AB2; font-size: 11px; letter-spacing: 8px; margin-bottom: 10px; text-shadow: 0 0 8px #FF8AB2; animation: tsFlicker 5s linear infinite; }
+.ts-title { color: #FFFFFF; font-size: 24px; font-weight: 500; letter-spacing: 8px; font-family: 'Noto Serif TC', serif; margin: 0 0 8px; }
+.ts-desc { color: rgba(224,207,255,0.6); font-size: 13px; letter-spacing: 4px; margin: 0; }
+
+.ts-more-wrap { text-align: center; margin-top: 32px; }
+.ts-btn-more {
+    display: inline-block; padding: 10px 32px;
+    border: 1px solid rgba(255,100,150,0.5); border-radius: 999px;
+    color: #FF8AB2; text-decoration: none; font-size: 13px; letter-spacing: 3px; transition: all .2s;
+}
+.ts-btn-more:hover { background: rgba(255,100,150,0.15); border-color: #ff6496; }
+
+.ts-quote-section { background: linear-gradient(135deg, #1a0835 0%, #0d0520 100%); padding: 80px 20px; text-align: center; }
+.ts-quote-inner { max-width: 800px; margin: 0 auto; }
+.ts-quote-text { font-size: clamp(1.6rem,4vw,2.8rem); color: #fff; letter-spacing: .25em; line-height: 1.8; font-weight: 300; font-family: 'Noto Serif TC', serif; }
+.ts-quote-attr { margin-top: 24px; color: #ff6496; letter-spacing: .3em; font-size: .9rem; }
+
+.ts-poetry-section { padding: 80px 32px; background: radial-gradient(ellipse at center, #2D1248 0%, #0A0118 70%); text-align: center; overflow: hidden; position: relative; }
+.ts-poetry-bg-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 60%, rgba(255,59,131,0.12) 0%, transparent 70%); }
+.ts-poetry-particle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #FF8AB2; opacity: .5; animation: tsFlicker 3s linear infinite; }
+.ts-particle-1 { top: 20%; left: 20%; animation-delay: 0s; }
+.ts-particle-2 { top: 70%; left: 75%; animation-delay: 1s; }
+.ts-particle-3 { top: 40%; left: 60%; animation-delay: 2s; }
+.ts-poetry-content { position: relative; z-index: 1; }
+.ts-poetry-text { color: #FFFFFF !important; font-size: 30px; line-height: 2; letter-spacing: 10px; max-width: 480px; margin: 0 auto; font-family: 'Noto Serif TC', serif; }
+.ts-poetry-attr { color: #FF8AB2 !important; font-size: 11px; letter-spacing: 6px; margin-top: 24px; font-family: 'Noto Sans TC', sans-serif; text-shadow: 0 0 6px #FF8AB2; animation: tsFlicker 5s linear infinite; }
+.ts-neon-pulse { animation: tsNeonPulse 3s ease-in-out infinite; }
+
+.ts-gradient-shift {
+    background: linear-gradient(90deg, #FF3B83 0%, #FF8AB2 25%, #C8A2FF 50%, #B388FF 75%, #FF3B83 100%) !important;
+    background-size: 300% 100% !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    animation: tsGradientShift 6s ease-in-out infinite !important;
+}
+
+.ts-c-pink   { color: #FF8AB2; }
+.ts-c-purple { color: #C8A2FF; }
+
+.ts-tag { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-family: 'Noto Sans TC', sans-serif; }
+.ts-tag-pink   { background: rgba(255,59,131,0.2);  color: #FF8AB2 !important; }
+.ts-tag-purple { background: rgba(200,162,255,0.2); color: #C8A2FF !important; }
+.ts-tag-rose   { background: rgba(255,59,131,0.2);  color: #FF3B83 !important; }
+
+.ts-pill { font-size: 10px; padding: 3px 10px; font-family: 'Noto Sans TC', sans-serif; border-radius: 999px; border: 0.5px solid; display: inline-block; line-height: 1.5; letter-spacing: 1px; white-space: nowrap !important; }
+.ts-pill-pink   { background: rgba(255,138,178,0.15) !important; color: #FF8AB2 !important; border-color: rgba(255,138,178,0.4) !important; }
+.ts-pill-purple { background: rgba(200,162,255,0.15) !important; color: #C8A2FF !important; border-color: rgba(200,162,255,0.4) !important; }
+
+.ts-match-card { background: rgba(20,10,35,0.8); border: 1px solid rgba(255,138,178,0.4); border-radius: 12px; overflow: hidden; transition: all 0.4s ease; }
+.ts-match-card:hover { transform: translateY(-4px); box-shadow: 0 0 32px rgba(255,138,178,0.45), inset 0 0 24px rgba(200,162,255,0.18); }
+.ts-match-card .ts-laser-line { display: none !important; }
+
+.ts-two-column  { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+.ts-three-column{ display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; max-width: 1200px; margin: 0 auto; }
+.ts-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
+
+.ts-card-box {
+    background: rgba(20,10,35,0.6);
+    border: 1px solid rgba(255,138,178,0.4);
+    box-shadow: 0 0 12px rgba(255,138,178,0.2), inset 0 0 12px rgba(200,162,255,0.1);
+    border-radius: 12px; overflow: hidden;
+}
+.ts-card-head { display: flex; justify-content: space-between; align-items: flex-end; padding: 16px 20px; border-bottom: 1px solid rgba(255,138,178,0.2); }
+.ts-head-pink  { background: rgba(255,100,150,0.08); }
+.ts-head-purple{ background: rgba(200,162,255,0.08); }
+.ts-card-label { color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 4px; margin-bottom: 4px; }
+.ts-card-title { color: #fff; font-family: 'Noto Serif TC', serif; font-size: 18px; letter-spacing: 4px; }
+.ts-card-more  { color: #FF8AB2; font-size: 12px; text-decoration: none; white-space: nowrap; }
+
+.ts-news-list { padding: 12px 0; }
+.ts-news-item { display: flex; flex-direction: column; padding: 12px 20px; border-bottom: 0.5px solid rgba(255,255,255,0.06); text-decoration: none; transition: background .2s; }
+.ts-news-item:hover { background: rgba(255,100,150,0.05); }
+.ts-news-date { color: rgba(255,138,178,0.7); font-size: 11px; letter-spacing: 2px; margin-bottom: 4px; }
+.ts-news-badge { display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(255,59,131,0.3); color: #FF8AB2; margin-right: 6px; letter-spacing: 1px; }
+.ts-news-title { color: #E0CFFF; font-size: 14px; letter-spacing: 1px; line-height: 1.6; }
+
+/* 首頁商品卡片 */
+.ts-section .ts-product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    gap: 20px !important;
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+    .ts-two-col, .ts-two-column, .ts-three-column { grid-template-columns: 1fr; }
+    .ts-section { padding: 40px 20px; }
+}

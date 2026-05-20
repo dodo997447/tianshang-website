@@ -1,0 +1,48 @@
+/* ============================================================
+   02-header-mobile.css · 手機選單 Header 控制
+   ⚠️ 重要：不可加 .ast-primary-header-bar { display: none }
+   漢堡按鈕在 .ast-mobile-header-wrap 裡的 .ast-primary-header-bar 內
+   ============================================================ */
+
+.menu-toggle, button.menu-toggle, .ast-mobile-menu-buttons-minimal {
+    background-color: transparent !important;
+    border: 1px solid rgba(255, 138, 178, 0.4) !important;
+    color: #FF8AB2 !important;
+}
+
+.menu-toggle .menu-toggle-icon, .menu-toggle svg, .menu-toggle path {
+    color: #FF8AB2 !important;
+    fill: #FF8AB2 !important;
+}
+
+/* 桌機版（922px以上）：隱藏手機 header，顯示桌機 header */
+@media (min-width: 922px) {
+    .ast-mobile-header-wrap { display: none !important; }
+    .ast-primary-header-bar { display: block !important; }
+}
+
+/* 手機版（921px以下）：顯示手機 header */
+@media (max-width: 921px) {
+    .ast-mobile-header-wrap {
+        display: flex !important;
+        z-index: 99999 !important;
+        min-height: 60px !important;
+        align-items: center !important;
+        position: relative !important;
+        background-color: #0A0118 !important;
+        border-bottom: 1px solid rgba(255, 138, 178, 0.2) !important;
+    }
+    .ast-button-wrap.ast-mobile-menu-buttons button.menu-toggle,
+    button.menu-toggle.main-header-menu-toggle {
+        display: flex !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 99999 !important;
+    }
+    .ast-mobile-header-wrap .ast-main-header-wrap {
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+}
