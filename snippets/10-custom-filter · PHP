@@ -1,14 +1,12 @@
 <?php
 /**
- * 水色雲間－自製篩選器
- * 取代 HUSKY，純 PHP + JS 實作
- * Hook: wp_footer（只在 /shop/ 頁面）
+ * 水色雲間－自製篩選器 v2
+ * 即時篩選，選了就跑，條件累加
  */
 add_action('wp_footer', 'ts_custom_filter');
 function ts_custom_filter() {
     if (!is_shop()) return;
 
-    // 抓所有已發布商品
     $products = wc_get_products([
         'status'  => 'publish',
         'limit'   => -1,
@@ -26,7 +24,6 @@ function ts_custom_filter() {
         $stype    = get_field('service_type', $id) ?: '';
         $services = get_field('services', $id) ?: '';
 
-        // 把 services 拆成陣列
         $svc_arr = [];
         if ($services) {
             $svc_arr = array_map('trim', preg_split('/[、,，]/u', $services));
@@ -34,24 +31,8 @@ function ts_custom_filter() {
             $svc_arr = array_values($svc_arr);
         }
 
-        // 取得商品圖片、連結
         $img  = get_the_post_thumbnail_url($id, 'medium') ?: wc_placeholder_img_src();
         $link = get_permalink($id);
-
-        // 縣市分類
-        $terms = get_the_terms($id, 'product_cat');
-        $city  = '';
-        if ($terms && !is_wp_error($terms)) {
-            foreach ($terms as $t) {
-                if (!in_array($t->slug, ['waiso', 'dingdian']) && !preg_match('/^(外送茶|定點茶|⭐)/', $t->name)) {
-                    // 找縣市層級的分類
-                    if ($t->parent == 0 || !in_array($t->name, ['外送茶','定點茶'])) {
-                        $city = $t->name;
-                        break;
-                    }
-                }
-            }
-        }
 
         $data[] = [
             'id'       => $id,
@@ -64,29 +45,22 @@ function ts_custom_filter() {
             'cup'      => $cup,
             'stype'    => $stype,
             'services' => $svc_arr,
-            'city'     => $city,
         ];
     }
 
-    // 收集所有服務選項
     $all_services = [];
     foreach ($data as $d) {
         foreach ($d['services'] as $s) {
-            if ($s && !in_array($s, $all_services)) {
-                $all_services[] = $s;
-            }
+            if ($s && !in_array($s, $all_services)) $all_services[] = $s;
         }
     }
     sort($all_services);
 
-    // 收集國籍
     $all_nat = array_unique(array_filter(array_column($data, 'nat')));
     sort($all_nat);
 
-    // 價格範圍
-    $prices = array_filter(array_column($data, 'price'));
-    $min_price = $prices ? (int) min($prices) : 0;
-    $max_price = $prices ? (int) max($prices) : 10000;
+    $min_price = 1500;
+    $max_price = 200000;
 
     ?>
 <div id="ts-filter-overlay-custom"></div>
@@ -97,22 +71,20 @@ function ts_custom_filter() {
   </div>
   <div id="ts-filter-panel-body-custom">
 
-    <!-- 價格 -->
     <div class="ts-fs">
       <div class="ts-fs-title">價格範圍</div>
       <div class="ts-price-display">
-        <span id="ts-price-min-label">NT$<?php echo number_format($min_price); ?></span>
+        <span id="ts-price-min-label">NT$1,500</span>
         <span> — </span>
-        <span id="ts-price-max-label">NT$<?php echo number_format($max_price); ?></span>
+        <span id="ts-price-max-label">NT$200,000</span>
       </div>
       <div class="ts-range-wrap">
-        <input type="range" id="ts-range-min" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo $min_price; ?>" step="100">
-        <input type="range" id="ts-range-max" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo $max_price; ?>" step="100">
+        <input type="range" id="ts-range-min" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo $min_price; ?>" step="500">
+        <input type="range" id="ts-range-max" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo $max_price; ?>" step="500">
         <div class="ts-range-track"><div id="ts-range-fill"></div></div>
       </div>
     </div>
 
-    <!-- 服務類型 -->
     <div class="ts-fs">
       <div class="ts-fs-title">服務類型</div>
       <div class="ts-chips" data-filter="stype">
@@ -122,7 +94,6 @@ function ts_custom_filter() {
       </div>
     </div>
 
-    <!-- 國籍 -->
     <div class="ts-fs">
       <div class="ts-fs-title">國籍</div>
       <div class="ts-chips" data-filter="nat">
@@ -132,7 +103,6 @@ function ts_custom_filter() {
       </div>
     </div>
 
-    <!-- 罩杯 -->
     <div class="ts-fs">
       <div class="ts-fs-title">罩杯</div>
       <div class="ts-chips" data-filter="cup">
@@ -145,7 +115,6 @@ function ts_custom_filter() {
       </div>
     </div>
 
-    <!-- 可配合服務 -->
     <div class="ts-fs">
       <div class="ts-fs-title">可配合服務</div>
       <div class="ts-chips" data-filter="services">
@@ -155,18 +124,13 @@ function ts_custom_filter() {
       </div>
     </div>
 
-  </div><!-- end body -->
+  </div>
 
-  <!-- 已選標籤 -->
   <div id="ts-active-tags"></div>
-
-  <!-- 套用按鈕 -->
-  <button id="ts-filter-apply-btn">套用篩選（顯示 <span id="ts-filter-result-count">0</span> 位）</button>
+  <div id="ts-filter-result-bar">顯示 <span id="ts-filter-result-count">0</span> 位</div>
 </div>
 
-<!-- 篩選觸發按鈕 -->
 <button id="ts-filter-trigger-btn">⚙ 篩選</button>
-<!-- 關閉按鈕 -->
 <button id="ts-filter-close-custom">✕ 關閉篩選</button>
 
 <script>
@@ -175,24 +139,22 @@ function ts_custom_filter() {
     var MIN_PRICE = <?php echo $min_price; ?>;
     var MAX_PRICE = <?php echo $max_price; ?>;
 
-    var panel     = document.getElementById('ts-filter-panel-custom');
-    var overlay   = document.getElementById('ts-filter-overlay-custom');
-    var triggerBtn= document.getElementById('ts-filter-trigger-btn');
-    var closeBtn  = document.getElementById('ts-filter-close-custom');
-    var applyBtn  = document.getElementById('ts-filter-apply-btn');
-    var countEl   = document.getElementById('ts-filter-result-count');
+    var panel         = document.getElementById('ts-filter-panel-custom');
+    var overlay       = document.getElementById('ts-filter-overlay-custom');
+    var triggerBtn    = document.getElementById('ts-filter-trigger-btn');
+    var closeBtn      = document.getElementById('ts-filter-close-custom');
+    var countEl       = document.getElementById('ts-filter-result-count');
     var activeCountEl = document.getElementById('ts-filter-active-count');
     var activeTagsEl  = document.getElementById('ts-active-tags');
-    var rangeMin  = document.getElementById('ts-range-min');
-    var rangeMax  = document.getElementById('ts-range-max');
-    var rangeFill = document.getElementById('ts-range-fill');
+    var rangeMin      = document.getElementById('ts-range-min');
+    var rangeMax      = document.getElementById('ts-range-max');
+    var rangeFill     = document.getElementById('ts-range-fill');
     var priceMinLabel = document.getElementById('ts-price-min-label');
     var priceMaxLabel = document.getElementById('ts-price-max-label');
 
-    // 篩選狀態
     var filters = { stype: [], nat: [], cup: [], services: [], priceMin: MIN_PRICE, priceMax: MAX_PRICE };
 
-    // 把篩選按鈕移到商品區上方
+    // 移動篩選按鈕到商品區上方
     var shopLoop = document.querySelector('.woocommerce-ordering, .woocommerce-result-count');
     if (shopLoop && shopLoop.parentNode) {
         shopLoop.parentNode.insertBefore(triggerBtn, shopLoop);
@@ -203,7 +165,7 @@ function ts_custom_filter() {
         overlay.style.display = 'block';
         closeBtn.style.display = 'block';
         triggerBtn.style.display = 'none';
-        updateCount();
+        applyFilter();
     }
     function closePanel() {
         panel.classList.remove('ts-open');
@@ -216,50 +178,7 @@ function ts_custom_filter() {
     closeBtn.addEventListener('click', closePanel);
     overlay.addEventListener('click', closePanel);
 
-    // Chip 點擊
-    document.querySelectorAll('.ts-chips .ts-chip').forEach(function(chip) {
-        chip.addEventListener('click', function() {
-            var filterKey = this.closest('.ts-chips').dataset.filter;
-            var val = this.dataset.val;
-            var idx = filters[filterKey].indexOf(val);
-            if (idx > -1) {
-                filters[filterKey].splice(idx, 1);
-                this.classList.remove('ts-chip-active');
-            } else {
-                filters[filterKey].push(val);
-                this.classList.add('ts-chip-active');
-            }
-            updateCount();
-            renderActiveTags();
-        });
-    });
-
-    // 價格滑桿
-    function updateRangeUI() {
-        var min = parseInt(rangeMin.value);
-        var max = parseInt(rangeMax.value);
-        var pct_min = (min - MIN_PRICE) / (MAX_PRICE - MIN_PRICE) * 100;
-        var pct_max = (max - MIN_PRICE) / (MAX_PRICE - MIN_PRICE) * 100;
-        rangeFill.style.left  = pct_min + '%';
-        rangeFill.style.right = (100 - pct_max) + '%';
-        priceMinLabel.textContent = 'NT$' + min.toLocaleString();
-        priceMaxLabel.textContent = 'NT$' + max.toLocaleString();
-        filters.priceMin = min;
-        filters.priceMax = max;
-        updateCount();
-    }
-
-    rangeMin.addEventListener('input', function() {
-        if (parseInt(this.value) > parseInt(rangeMax.value)) this.value = rangeMax.value;
-        updateRangeUI();
-    });
-    rangeMax.addEventListener('input', function() {
-        if (parseInt(this.value) < parseInt(rangeMin.value)) this.value = rangeMin.value;
-        updateRangeUI();
-    });
-    updateRangeUI();
-
-    // 計算符合條件的商品數量
+    // 取得符合條件的商品
     function getFiltered() {
         return PRODUCTS.filter(function(p) {
             if (p.price > 0 && (p.price < filters.priceMin || p.price > filters.priceMax)) return false;
@@ -281,27 +200,85 @@ function ts_custom_filter() {
         });
     }
 
-    function updateCount() {
+    // 即時套用篩選到商品列表
+    function applyFilter() {
         var filtered = getFiltered();
         countEl.textContent = filtered.length;
+
+        var productList = document.querySelector('.woocommerce ul.products');
+        if (!productList) return;
+
+        var allItems = productList.querySelectorAll('li.product');
+        allItems.forEach(function(item) {
+            var found = filtered.some(function(p) {
+                return item.className.indexOf('post-' + p.id) > -1;
+            });
+            item.style.display = found ? '' : 'none';
+        });
+
+        // 更新已選數量
         var total = filters.stype.length + filters.nat.length + filters.cup.length + filters.services.length;
-        if (filters.priceMin > MIN_PRICE || filters.priceMax < MAX_PRICE) total++;
+        var priceChanged = filters.priceMin > MIN_PRICE || filters.priceMax < MAX_PRICE;
+        if (priceChanged) total++;
         activeCountEl.textContent = total > 0 ? total + ' 項已選' : '';
     }
 
+    // Chip 點擊 → 即時篩選
+    document.querySelectorAll('.ts-chips .ts-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            var filterKey = this.closest('.ts-chips').dataset.filter;
+            var val = this.dataset.val;
+            var idx = filters[filterKey].indexOf(val);
+            if (idx > -1) {
+                filters[filterKey].splice(idx, 1);
+                this.classList.remove('ts-chip-active');
+            } else {
+                filters[filterKey].push(val);
+                this.classList.add('ts-chip-active');
+            }
+            applyFilter();
+            renderActiveTags();
+        });
+    });
+
+    // 價格滑桿 → 即時篩選
+    function updateRangeUI() {
+        var min = parseInt(rangeMin.value);
+        var max = parseInt(rangeMax.value);
+        var pct_min = (min - MIN_PRICE) / (MAX_PRICE - MIN_PRICE) * 100;
+        var pct_max = (max - MIN_PRICE) / (MAX_PRICE - MIN_PRICE) * 100;
+        rangeFill.style.left  = pct_min + '%';
+        rangeFill.style.right = (100 - pct_max) + '%';
+        priceMinLabel.textContent = 'NT$' + min.toLocaleString();
+        priceMaxLabel.textContent = 'NT$' + max.toLocaleString();
+        filters.priceMin = min;
+        filters.priceMax = max;
+        applyFilter();
+    }
+
+    rangeMin.addEventListener('input', function() {
+        if (parseInt(this.value) > parseInt(rangeMax.value)) this.value = rangeMax.value;
+        updateRangeUI();
+    });
+    rangeMax.addEventListener('input', function() {
+        if (parseInt(this.value) < parseInt(rangeMin.value)) this.value = rangeMin.value;
+        updateRangeUI();
+    });
+    updateRangeUI();
+
+    // 已選標籤
     function renderActiveTags() {
         var tags = [];
-        filters.stype.forEach(function(v) { tags.push({key:'stype', val:v}); });
-        filters.nat.forEach(function(v)   { tags.push({key:'nat', val:v}); });
-        filters.cup.forEach(function(v)   { tags.push({key:'cup', val:v}); });
+        filters.stype.forEach(function(v)    { tags.push({key:'stype', val:v}); });
+        filters.nat.forEach(function(v)      { tags.push({key:'nat', val:v}); });
+        filters.cup.forEach(function(v)      { tags.push({key:'cup', val:v}); });
         filters.services.forEach(function(v) { tags.push({key:'services', val:v}); });
 
         if (tags.length === 0) { activeTagsEl.innerHTML = ''; return; }
 
-        var html = tags.map(function(t) {
+        activeTagsEl.innerHTML = tags.map(function(t) {
             return '<span class="ts-active-tag" data-key="'+t.key+'" data-val="'+t.val+'">'+t.val+' ✕</span>';
         }).join('');
-        activeTagsEl.innerHTML = html;
 
         activeTagsEl.querySelectorAll('.ts-active-tag').forEach(function(el) {
             el.addEventListener('click', function() {
@@ -309,43 +286,22 @@ function ts_custom_filter() {
                 var val = this.dataset.val;
                 var idx = filters[key].indexOf(val);
                 if (idx > -1) filters[key].splice(idx, 1);
-                // 取消 chip 的 active 狀態
                 document.querySelectorAll('.ts-chips[data-filter="'+key+'"] .ts-chip').forEach(function(c) {
                     if (c.dataset.val === val) c.classList.remove('ts-chip-active');
                 });
-                updateCount();
+                applyFilter();
                 renderActiveTags();
             });
         });
     }
 
-    // 套用篩選 → 更新商品列表
-    applyBtn.addEventListener('click', function() {
-        var filtered = getFiltered();
-        var productList = document.querySelector('.woocommerce ul.products');
-        if (!productList) { closePanel(); return; }
-
-        var allItems = productList.querySelectorAll('li.product');
-        var filteredIds = filtered.map(function(p) { return p.id; });
-
-        allItems.forEach(function(item) {
-            var postId = parseInt(item.dataset.productId || item.querySelector('a[data-product_id]')?.dataset.product_id || 0);
-            // 用 class 比對
-            var classes = item.className;
-            var found = filtered.some(function(p) {
-                return classes.indexOf('post-'+p.id) > -1;
-            });
-            item.style.display = found ? '' : 'none';
-        });
-
-        closePanel();
-    });
+    // 初始化
+    applyFilter();
 
 })();
 </script>
 
 <style>
-/* 篩選觸發按鈕 */
 #ts-filter-trigger-btn {
     display: block;
     width: 100%;
@@ -362,8 +318,6 @@ function ts_custom_filter() {
     text-align: center;
     box-sizing: border-box;
 }
-
-/* 關閉按鈕 */
 #ts-filter-close-custom {
     display: none;
     position: fixed;
@@ -382,8 +336,6 @@ function ts_custom_filter() {
     z-index: 99999;
     white-space: nowrap;
 }
-
-/* Overlay */
 #ts-filter-overlay-custom {
     display: none;
     position: fixed;
@@ -391,8 +343,6 @@ function ts_custom_filter() {
     background: rgba(0,0,0,0.5);
     z-index: 9990;
 }
-
-/* 篩選面板 */
 #ts-filter-panel-custom {
     display: none;
     position: fixed;
@@ -406,8 +356,6 @@ function ts_custom_filter() {
     box-sizing: border-box;
 }
 #ts-filter-panel-custom.ts-open { display: block; }
-
-/* Panel Header */
 #ts-filter-panel-header-custom {
     display: flex;
     justify-content: space-between;
@@ -419,26 +367,14 @@ function ts_custom_filter() {
     font-size: 16px;
     letter-spacing: 4px;
     background: rgba(200,162,255,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
-#ts-filter-active-count {
-    font-size: 12px;
-    color: #FF8AB2;
-    letter-spacing: 2px;
-}
-
-/* Panel Body */
+#ts-filter-active-count { font-size: 12px; color: #FF8AB2; letter-spacing: 2px; }
 #ts-filter-panel-body-custom { padding: 16px 20px; }
-
-/* Filter Section */
 .ts-fs { margin-bottom: 20px; }
-.ts-fs-title {
-    color: #FF8AB2;
-    font-size: 11px;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
-}
-
-/* Chips */
+.ts-fs-title { color: #FF8AB2; font-size: 11px; letter-spacing: 4px; margin-bottom: 10px; }
 .ts-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .ts-chip {
     padding: 6px 14px;
@@ -448,7 +384,7 @@ function ts_custom_filter() {
     font-size: 12px;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     font-family: 'Noto Sans TC', sans-serif;
 }
 .ts-chip:hover { border-color: rgba(200,162,255,0.6); color: #E0CFFF; }
@@ -457,12 +393,10 @@ function ts_custom_filter() {
     border-color: #FF8AB2;
     color: #FF8AB2;
 }
-
-/* 價格範圍 */
 .ts-price-display {
-    color: rgba(224,207,255,0.7);
+    color: rgba(224,207,255,0.8);
     font-size: 13px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     letter-spacing: 1px;
 }
 .ts-range-wrap {
@@ -505,19 +439,14 @@ function ts_custom_filter() {
     background: linear-gradient(90deg, #C8A2FF, #FF8AB2);
     border-radius: 2px;
 }
-
-/* 已選標籤 */
 #ts-active-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     padding: 10px 20px;
-    border-top: 0.5px solid rgba(255,138,178,0.15);
-    min-height: 0;
+    border-top: 0.5px solid rgba(255,138,178,0.1);
 }
 .ts-active-tag {
-    display: flex;
-    align-items: center;
     padding: 4px 12px;
     background: rgba(255,138,178,0.15);
     border: 0.5px solid rgba(255,138,178,0.4);
@@ -527,24 +456,16 @@ function ts_custom_filter() {
     letter-spacing: 1px;
     cursor: pointer;
 }
-
-/* 套用按鈕 */
-#ts-filter-apply-btn {
-    width: 100%;
-    padding: 14px;
-    background: rgba(255,138,178,0.1);
-    border: none;
-    border-top: 0.5px solid rgba(255,138,178,0.3);
-    color: #FF8AB2;
-    font-size: 14px;
-    letter-spacing: 4px;
-    cursor: pointer;
-    font-family: 'Noto Serif TC', serif;
+#ts-filter-result-bar {
+    padding: 12px 20px;
+    border-top: 0.5px solid rgba(255,138,178,0.15);
+    color: rgba(224,207,255,0.6);
+    font-size: 13px;
+    letter-spacing: 3px;
     text-align: center;
+    font-family: 'Noto Serif TC', serif;
 }
-#ts-filter-apply-btn:hover { background: rgba(255,138,178,0.2); }
-
-/* 桌機版隱藏篩選按鈕 */
+#ts-filter-result-count { color: #FF8AB2; font-size: 15px; }
 @media (min-width: 922px) {
     #ts-filter-trigger-btn,
     #ts-filter-close-custom,

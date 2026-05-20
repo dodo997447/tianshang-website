@@ -230,6 +230,8 @@
 18. HUSKY AJAX 與 sidebar 隱藏衝突 → 不移動 DOM，用 CSS `display:none` + JS toggle `ts-open` class ✅
 19. 篩選展開時擠壓商品 → `position: fixed` 讓 sidebar 脫離文件流 ✅
 20. 篩選展開時側邊顯示 → JS 用 `style.setProperty('flex-direction', 'column', 'important')` 強制覆蓋 Astra CSS ✅
+21. 自製篩選器取代HUSKY → 純PHP+JS，選了即時篩選，罩杯/服務/國籍/價格條件累加
+22. 手機選單加「選擇地區」tab → 18縣市跳對應 product-category 頁面（SEO友善）
 
 ---
 
@@ -324,6 +326,8 @@
 - [ ] 首頁縣市數量「-- 位」問題
 - [ ] 桃源手記和青羚報音 SEO 維持分開
 - [ ] 商品卡片點擊後 URL slug 確認
+- [x] 水色雲間手機版自製篩選器（即時篩選、條件累加）✅
+- [x] 手機選單加入「選擇地區」18縣市 ✅
 
 ---
 
