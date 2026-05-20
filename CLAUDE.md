@@ -103,16 +103,17 @@
 
 ## Code Snippets 清單（已整理）
 
-| 名稱 | 類型 | 狀態 | 說明 |
-|-----|------|------|------|
-| 天上人間－媒合卡片 v3 | PHP | 啟用 | matches 文章類型卡片顯示 |
-| 天上人間－首頁精選 Shortcode | PHP | 啟用 | [ts_latest_matches] shortcode |
-| 天上人間－踏雲尋境 | PHP | 啟用 | 踏雲尋境頁面功能 |
-| 天上人間－桃源筆記 | PHP | 啟用 | 桃源手記頁面功能 |
-| 天上人間－青羚報音 | PHP | 啟用 | 青羚報音頁面功能 |
-| 水色雲間－卡片縣市顯示 | PHP | 啟用 | 商品卡片顯示縣市（JS前端替換） |
-| 天上人間－首頁 Shortcode | PHP | 啟用 | 首頁3個 shortcode + OR meta_query |
-| 水色雲間－商店版面 | PHP | 啟用 | /shop 縣市 banner + CSS |
+| 檔名 | 說明 |
+|-----|------|
+| 01-match-card.php | 媒合卡片 v3，matches 文章類型卡片顯示 |
+| 02-taoyuan-notes.php | 桃源手記頁面功能 |
+| 03-explore.php | 踏雲尋境頁面功能 |
+| 04-news.php | 青羚報音頁面功能 |
+| 05-homepage-shortcode.php | 首頁3個 shortcode + OR meta_query |
+| 06-homepage-featured.php | [ts_latest_matches] shortcode |
+| 07-shop-city-display.php | 商品卡片顯示縣市（JS前端替換） |
+| 08-shop-layout.php | /shop 縣市 banner + CSS |
+| 09-shop-city-banner.php | 水色雲間縣市 Banner |
 
 ### 重要 Shortcodes
 - `[ts_products_by_service type="外送茶" limit="4"]`：首頁外送茶（OR meta_query，含外送+定點）
@@ -125,6 +126,7 @@
 ## 全站 CSS
 
 完整整理版：`tianshang-style.css`（共 15 個區塊）
+分類版本：`css/` 資料夾（GitHub 管理用）
 
 ### CSS 區塊 4：Header 控制邏輯
 ```css
@@ -149,13 +151,8 @@
 
 ### CSS 區塊 15：手機版 Shop 頁面
 ```css
-/* 手機版隱藏縣市 banner */
 @media (max-width: 921px) {
     .ts-shop-hero { display: none !important; }
-}
-
-/* 手機版 sidebar 控制 */
-@media (max-width: 921px) {
     #secondary {
         display: none !important;
         order: 1 !important;
@@ -163,16 +160,13 @@
         float: none !important;
         max-width: 100% !important;
     }
-    #secondary.ts-open {
-        display: block !important;
-    }
+    #secondary.ts-open { display: block !important; }
     #primary {
         order: 2 !important;
         width: 100% !important;
         float: none !important;
         max-width: 100% !important;
     }
-    /* 篩選展開時浮在商品上方 */
     body #secondary.ts-open {
         position: fixed !important;
         top: 60px !important;
@@ -297,7 +291,7 @@
 
 ## functions.php 自定義內容（最新版）
 
-完整程式碼在 GitHub：`functions-custom.php`
+完整程式碼在 GitHub：`functions.php`
 
 ### 三個主要函數
 1. `tianshang_auto_short_desc` — 水色雲間商品簡短說明（ACF 欄位轉 HTML）
@@ -369,22 +363,46 @@ WHERE t.slug = 'waiso' AND p.post_type = 'product' AND p.post_status = 'publish'
 ---
 
 ## GitHub 檔案結構
+
 ```
 tianshang-website/
 ├── CLAUDE.md
-├── functions-custom.php
+├── functions.php
 ├── tianshang-style.css
+├── css/
+│   ├── 01-base.css
+│   ├── 02-header-mobile.css
+│   ├── 03-homepage.css
+│   ├── 04-shop.css
+│   ├── 05-articles.css
+│   └── 06-product-single.css
 └── snippets/
-    ├── 01-product-card.php
-    ├── 02-homepage-shortcode.php
-    ├── 03-mobile-menu.php
-    ├── 04-shop-hero.php
-    └── 05-city-count.php
+    ├── 01-match-card.php
+    ├── 02-taoyuan-notes.php
+    ├── 03-explore.php
+    ├── 04-news.php
+    ├── 05-homepage-shortcode.php
+    ├── 06-homepage-featured.php
+    ├── 07-shop-city-display.php
+    ├── 08-shop-layout.php
+    └── 09-shop-city-banner.php
 ```
 
-每次開新對話，fetch 這些 URL 取得最新 code：
+---
+
+## 每次開新對話貼這些 URL
+
 ```
-https://raw.githubusercontent.com/dodo997447/tianshang-website/main/CLAUDE.md
-https://raw.githubusercontent.com/dodo997447/tianshang-website/main/functions-custom.php
-https://raw.githubusercontent.com/dodo997447/tianshang-website/main/tianshang-style.css
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/CLAUDE.md
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/functions.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/tianshang-style.css
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/01-match-card.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/02-taoyuan-notes.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/03-explore.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/04-news.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/05-homepage-shortcode.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/06-homepage-featured.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/07-shop-city-display.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/08-shop-layout.php
+https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/09-shop-city-banner.php
 ```
