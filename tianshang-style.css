@@ -1304,6 +1304,8 @@ ul.woocommerce-info {
     }
 }
 /* 隱藏 WooCommerce 原生結果數量（改用自製篩選器顯示）*/
-body.woocommerce-shop .woocommerce-result-count {
+form.woocommerce-ordering {
     display: none !important;
 }
+form.woocommerce-ordering { display: none !important; }
+.woocommerce-result-count { display: none !important; }

@@ -1,7 +1,7 @@
 
 /**
- * 水色雲間－自製篩選器 v2
- * 即時篩選，選了就跑，條件累加
+ * 水色雲間－自製篩選器 v4
+ * 確認篩選後在商品列表上方顯示已選條件標籤
  */
 add_action('wp_footer', 'ts_custom_filter');
 function ts_custom_filter() {
@@ -20,8 +20,8 @@ function ts_custom_filter() {
         $price    = (float) $product->get_regular_price();
         $nat      = get_field('nationality', $id) ?: '';
         $age      = (int) get_field('age', $id);
-		$cup = get_field('cup_size', $id) ?: '';
-		$cup = str_replace('罩杯', '', $cup); // 統一去掉「罩杯」
+        $cup      = get_field('cup_size', $id) ?: '';
+		$cup = str_replace(['罩杯以上', '罩杯'], '', $cup);
         $stype    = get_field('service_type', $id) ?: '';
         $services = get_field('services', $id) ?: '';
 
@@ -62,7 +62,6 @@ function ts_custom_filter() {
 
     $min_price = 1500;
     $max_price = 200000;
-
     ?>
 <div id="ts-filter-overlay-custom"></div>
 <div id="ts-filter-panel-custom">
@@ -113,6 +112,7 @@ function ts_custom_filter() {
         <span class="ts-chip" data-val="D">D</span>
         <span class="ts-chip" data-val="E">E</span>
         <span class="ts-chip" data-val="F">F</span>
+		<span class="ts-chip" data-val="G">G以上</span>
       </div>
     </div>
 
@@ -127,16 +127,24 @@ function ts_custom_filter() {
 
   </div>
 
-  <div id="ts-active-tags"></div>
+  <div id="ts-active-tags-wrap">
+    <span id="ts-filter-reset" style="display:none">× 重置</span>
+    <div id="ts-active-tags"></div>
+  </div>
+
   <div id="ts-filter-result-bar">顯示 <span id="ts-filter-result-count">0</span> 位</div>
 </div>
 
+<!-- 篩選按鈕 -->
 <button id="ts-filter-trigger-btn">⚙ 篩選</button>
-<button id="ts-filter-close-custom">✕ 確認篩選</button>
+<!-- 面板外已選條件列 -->
+<div id="ts-active-tags-outside"></div>
+<!-- 確認篩選按鈕 -->
+<button id="ts-filter-close-custom">✓ 確認篩選</button>
 
 <script>
 (function(){
-    var PRODUCTS = <?php echo json_encode($data, JSON_UNESCAPED_UNICODE); ?>;
+    var PRODUCTS  = <?php echo json_encode($data, JSON_UNESCAPED_UNICODE); ?>;
     var MIN_PRICE = <?php echo $min_price; ?>;
     var MAX_PRICE = <?php echo $max_price; ?>;
 
@@ -147,6 +155,8 @@ function ts_custom_filter() {
     var countEl       = document.getElementById('ts-filter-result-count');
     var activeCountEl = document.getElementById('ts-filter-active-count');
     var activeTagsEl  = document.getElementById('ts-active-tags');
+    var outsideEl     = document.getElementById('ts-active-tags-outside');
+    var resetBtn      = document.getElementById('ts-filter-reset');
     var rangeMin      = document.getElementById('ts-range-min');
     var rangeMax      = document.getElementById('ts-range-max');
     var rangeFill     = document.getElementById('ts-range-fill');
@@ -155,53 +165,46 @@ function ts_custom_filter() {
 
     var filters = { stype: [], nat: [], cup: [], services: [], priceMin: MIN_PRICE, priceMax: MAX_PRICE };
 
-    // 移動篩選按鈕到商品區上方
+    // 移動篩選按鈕和外部條件列到商品區上方
     var shopLoop = document.querySelector('.woocommerce-ordering, .woocommerce-result-count');
     if (shopLoop && shopLoop.parentNode) {
-        shopLoop.parentNode.insertBefore(triggerBtn, shopLoop);
+        shopLoop.parentNode.insertBefore(outsideEl, shopLoop);
+        shopLoop.parentNode.insertBefore(triggerBtn, outsideEl);
     }
 
     function openPanel() {
         panel.classList.add('ts-open');
         overlay.style.display = 'block';
         closeBtn.style.display = 'block';
-        triggerBtn.style.display = 'none';
         applyFilter();
     }
     function closePanel() {
         panel.classList.remove('ts-open');
         overlay.style.display = 'none';
         closeBtn.style.display = 'none';
-        triggerBtn.style.display = 'block';
     }
 
     triggerBtn.addEventListener('click', openPanel);
     closeBtn.addEventListener('click', closePanel);
     overlay.addEventListener('click', closePanel);
 
-    // 取得符合條件的商品
     function getFiltered() {
         return PRODUCTS.filter(function(p) {
             if (p.price > 0 && (p.price < filters.priceMin || p.price > filters.priceMax)) return false;
             if (filters.stype.length > 0) {
-                var match = filters.stype.some(function(s) {
-                    return p.stype && p.stype.indexOf(s) > -1;
-                });
+                var match = filters.stype.some(function(s) { return p.stype && p.stype.indexOf(s) > -1; });
                 if (!match) return false;
             }
             if (filters.nat.length > 0 && filters.nat.indexOf(p.nat) === -1) return false;
             if (filters.cup.length > 0 && filters.cup.indexOf(p.cup) === -1) return false;
             if (filters.services.length > 0) {
-                var match = filters.services.every(function(s) {
-                    return p.services.indexOf(s) > -1;
-                });
+                var match = filters.services.every(function(s) { return p.services.indexOf(s) > -1; });
                 if (!match) return false;
             }
             return true;
         });
     }
 
-    // 即時套用篩選到商品列表
     function applyFilter() {
         var filtered = getFiltered();
         countEl.textContent = filtered.length;
@@ -217,14 +220,12 @@ function ts_custom_filter() {
             item.style.display = found ? '' : 'none';
         });
 
-        // 更新已選數量
         var total = filters.stype.length + filters.nat.length + filters.cup.length + filters.services.length;
         var priceChanged = filters.priceMin > MIN_PRICE || filters.priceMax < MAX_PRICE;
         if (priceChanged) total++;
         activeCountEl.textContent = total > 0 ? total + ' 項已選' : '';
     }
 
-    // Chip 點擊 → 即時篩選
     document.querySelectorAll('.ts-chips .ts-chip').forEach(function(chip) {
         chip.addEventListener('click', function() {
             var filterKey = this.closest('.ts-chips').dataset.filter;
@@ -242,7 +243,6 @@ function ts_custom_filter() {
         });
     });
 
-    // 價格滑桿 → 即時篩選
     function updateRangeUI() {
         var min = parseInt(rangeMin.value);
         var max = parseInt(rangeMax.value);
@@ -267,7 +267,28 @@ function ts_custom_filter() {
     });
     updateRangeUI();
 
-    // 已選標籤
+    function doReset() {
+        filters = { stype: [], nat: [], cup: [], services: [], priceMin: MIN_PRICE, priceMax: MAX_PRICE };
+        document.querySelectorAll('.ts-chip').forEach(function(c) { c.classList.remove('ts-chip-active'); });
+        rangeMin.value = MIN_PRICE;
+        rangeMax.value = MAX_PRICE;
+        updateRangeUI();
+        applyFilter();
+        renderActiveTags();
+    }
+
+    resetBtn.addEventListener('click', doReset);
+
+    function removeTag(key, val) {
+        var idx = filters[key].indexOf(val);
+        if (idx > -1) filters[key].splice(idx, 1);
+        document.querySelectorAll('.ts-chips[data-filter="'+key+'"] .ts-chip').forEach(function(c) {
+            if (c.dataset.val === val) c.classList.remove('ts-chip-active');
+        });
+        applyFilter();
+        renderActiveTags();
+    }
+
     function renderActiveTags() {
         var tags = [];
         filters.stype.forEach(function(v)    { tags.push({key:'stype', val:v}); });
@@ -275,30 +296,45 @@ function ts_custom_filter() {
         filters.cup.forEach(function(v)      { tags.push({key:'cup', val:v}); });
         filters.services.forEach(function(v) { tags.push({key:'services', val:v}); });
 
-        if (tags.length === 0) { activeTagsEl.innerHTML = ''; return; }
+        resetBtn.style.display = tags.length > 0 ? 'inline-flex' : 'none';
 
-        activeTagsEl.innerHTML = tags.map(function(t) {
-            return '<span class="ts-active-tag" data-key="'+t.key+'" data-val="'+t.val+'">'+t.val+' ✕</span>';
-        }).join('');
-
-        activeTagsEl.querySelectorAll('.ts-active-tag').forEach(function(el) {
-            el.addEventListener('click', function() {
-                var key = this.dataset.key;
-                var val = this.dataset.val;
-                var idx = filters[key].indexOf(val);
-                if (idx > -1) filters[key].splice(idx, 1);
-                document.querySelectorAll('.ts-chips[data-filter="'+key+'"] .ts-chip').forEach(function(c) {
-                    if (c.dataset.val === val) c.classList.remove('ts-chip-active');
+        // 面板內標籤
+        if (tags.length === 0) {
+            activeTagsEl.innerHTML = '';
+        } else {
+            activeTagsEl.innerHTML = tags.map(function(t) {
+                return '<span class="ts-active-tag" data-key="'+t.key+'" data-val="'+t.val+'">× '+t.val+'</span>';
+            }).join('');
+            activeTagsEl.querySelectorAll('.ts-active-tag').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    removeTag(this.dataset.key, this.dataset.val);
                 });
-                applyFilter();
-                renderActiveTags();
+            });
+        }
+
+        // 面板外標籤（確認篩選後可見）
+        if (!outsideEl) return;
+        if (tags.length === 0) {
+            outsideEl.innerHTML = '';
+            outsideEl.style.display = 'none';
+            return;
+        }
+        outsideEl.style.display = 'flex';
+        var html = '<span id="ts-outside-reset">× 重置</span>';
+        html += tags.map(function(t) {
+            return '<span class="ts-outside-tag" data-key="'+t.key+'" data-val="'+t.val+'">× '+t.val+'</span>';
+        }).join('');
+        outsideEl.innerHTML = html;
+
+        document.getElementById('ts-outside-reset').addEventListener('click', doReset);
+        outsideEl.querySelectorAll('.ts-outside-tag').forEach(function(el) {
+            el.addEventListener('click', function() {
+                removeTag(this.dataset.key, this.dataset.val);
             });
         });
     }
 
-    // 初始化
     applyFilter();
-
 })();
 </script>
 
@@ -315,9 +351,36 @@ function ts_custom_filter() {
     letter-spacing: 4px;
     cursor: pointer;
     font-family: 'Noto Serif TC', serif;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     text-align: center;
     box-sizing: border-box;
+}
+#ts-active-tags-outside {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+#ts-outside-reset {
+    padding: 4px 12px;
+    background: rgba(255,59,131,0.15);
+    border: 0.5px solid rgba(255,59,131,0.4);
+    border-radius: 999px;
+    color: #FF3B83;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+.ts-outside-tag {
+    padding: 4px 12px;
+    background: rgba(255,138,178,0.15);
+    border: 0.5px solid rgba(255,138,178,0.4);
+    border-radius: 999px;
+    color: #FF8AB2;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
 }
 #ts-filter-close-custom {
     display: none;
@@ -325,9 +388,9 @@ function ts_custom_filter() {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #2D1B4E;
-    color: #FF8AB2;
-    border: 0.5px solid #FF8AB2;
+    background: #FF8AB2;
+    color: #0A0118;
+    border: none;
     border-radius: 24px;
     padding: 12px 32px;
     font-size: 14px;
@@ -336,14 +399,13 @@ function ts_custom_filter() {
     font-family: 'Noto Serif TC', serif;
     z-index: 99999;
     white-space: nowrap;
+    font-weight: 500;
 }
 #ts-filter-overlay-custom {
     display: none;
     position: fixed;
-    top: 60px;
-    left: 0; right: 0;
-    height: 50vh;
-    background: transparent;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
     z-index: 9990;
 }
 #ts-filter-panel-custom {
@@ -443,12 +505,26 @@ function ts_custom_filter() {
     background: linear-gradient(90deg, #C8A2FF, #FF8AB2);
     border-radius: 2px;
 }
-#ts-active-tags {
+#ts-active-tags-wrap {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 6px;
     padding: 10px 20px;
     border-top: 0.5px solid rgba(255,138,178,0.1);
+}
+#ts-filter-reset {
+    display: none;
+    align-items: center;
+    padding: 4px 12px;
+    background: rgba(255,59,131,0.15);
+    border: 0.5px solid rgba(255,59,131,0.4);
+    border-radius: 999px;
+    color: #FF3B83;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 .ts-active-tag {
     padding: 4px 12px;
