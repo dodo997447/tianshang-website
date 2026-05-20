@@ -1,6 +1,6 @@
 /* ============================================================
    天上人間 · 完整自訂樣式（整理版）
-   最後更新：2026-05-19
+   最後更新：2026-05-20
    ============================================================ */
 
 /* === 載入 Google 字型 === */
@@ -122,7 +122,6 @@ body, p, li, span { color: #E0CFFF; font-family: 'Noto Sans TC', sans-serif !imp
    區塊 4：手機選單 Header 控制
    ============================================================ */
 
-/* 漢堡按鈕樣式 */
 .menu-toggle, button.menu-toggle, .ast-mobile-menu-buttons-minimal {
     background-color: transparent !important;
     border: 1px solid rgba(255, 138, 178, 0.4) !important;
@@ -136,22 +135,17 @@ body, p, li, span { color: #E0CFFF; font-family: 'Noto Sans TC', sans-serif !imp
 
 /* 桌機版（922px以上）：隱藏手機 header，顯示桌機 header */
 @media (min-width: 922px) {
-    .ast-mobile-header-wrap {
-        display: none !important;
-    }
-    .ast-primary-header-bar {
-        display: block !important;
-    }
+    .ast-mobile-header-wrap { display: none !important; }
+    .ast-primary-header-bar { display: block !important; }
 }
 
-/* 手機版（921px以下）：隱藏桌機 header，顯示手機 header */
+/* 手機版（921px以下）：顯示手機 header */
 @media (max-width: 921px) {
-
     .ast-mobile-header-wrap {
         display: flex !important;
         z-index: 99999 !important;
-			  min-height: 60px !important;        			/* 加這行 */
-        align-items: center !important;     		/* 加這行，讓內容垂直置中 */
+        min-height: 60px !important;
+        align-items: center !important;
         position: relative !important;
         background-color: #0A0118 !important;
         border-bottom: 1px solid rgba(255, 138, 178, 0.2) !important;
@@ -165,7 +159,6 @@ body, p, li, span { color: #E0CFFF; font-family: 'Noto Sans TC', sans-serif !imp
         position: relative !important;
         z-index: 99999 !important;
     }
-    /* 漢堡按鈕靠右 */
     .ast-mobile-header-wrap .ast-main-header-wrap {
         justify-content: space-between !important;
         width: 100% !important;
@@ -174,7 +167,7 @@ body, p, li, span { color: #E0CFFF; font-family: 'Noto Sans TC', sans-serif !imp
 
 
 /* ============================================================
-   區塊 5：水色雲間 Shop 頁面
+   區塊 5：水色雲間 Shop 頁面（商品卡片 & 篩選器樣式）
    ============================================================ */
 
 .woocommerce ul.products li.product {
@@ -1236,9 +1229,10 @@ ul.woocommerce-info {
 
 
 /* ============================================================
-   區塊 15：首頁商品卡片置中
+   區塊 15：Shop 版面 & RWD
    ============================================================ */
 
+/* 首頁商品格線 */
 .ts-section .ts-product-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
@@ -1249,24 +1243,80 @@ ul.woocommerce-info {
     padding: 0 !important;
     box-sizing: border-box !important;
 }
-/* 手機版隱藏縣市 banner */
+
+/* 隱藏 WooCommerce 原生排序與結果數 */
+form.woocommerce-ordering,
+.woocommerce-result-count { display: none !important; }
+
+/* 水色雲間 breadcrumb 置中 */
+.woocommerce-shop .woocommerce-products-header,
+.woocommerce-shop .woocommerce-breadcrumb {
+    text-align: center !important;
+    padding-left: 0 !important;
+}
+
+/* ── 桌機版（922px以上）：Shop 版面 ── */
+@media (min-width: 922px) {
+
+    /* 外層容器置中 */
+    .woocommerce-shop .ast-container {
+        max-width: 1200px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        position: relative !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 商品區：左邊讓出 sidebar 空間 */
+    .woocommerce-shop #primary {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 236px !important;
+        padding-right: 24px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* sidebar：絕對定位貼左 */
+    #ts-cf-sidebar {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 220px !important;
+        box-sizing: border-box !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border-bottom: none !important;
+    }
+
+    /* 商品 3 欄 */
+    .woocommerce ul.products.columns-3 {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 20px !important;
+    }
+}
+
+/* ── 手機版（921px以下）：Shop & 全站 RWD ── */
 @media (max-width: 921px) {
+
+    /* 防水平捲動 */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+    }
+
+    /* 隱藏縣市 banner */
+    .ts-shop-hero,
     .ts-city-grid,
     .ts-city-banner,
-    .ts-city-banner-wrap {
-        display: none !important;
-    }
-}
+    .ts-city-banner-wrap { display: none !important; }
 
-/* 商品圖片比例修正 */
-@media (max-width: 921px) {
-    .ts-shop-hero {
-        display: none !important;
-    }
-}
-
-@media (max-width: 921px) {
-
+    /* Sidebar 預設隱藏，開啟時固定浮層 */
     #secondary {
         display: none !important;
         order: 1 !important;
@@ -1276,16 +1326,6 @@ ul.woocommerce-info {
     }
     #secondary.ts-open {
         display: block !important;
-    }
-    #primary {
-        order: 2 !important;
-        width: 100% !important;
-        float: none !important;
-        max-width: 100% !important;
-    }
-}
-@media (max-width: 921px) {
-    body #secondary.ts-open {
         position: fixed !important;
         top: 60px !important;
         left: 0 !important;
@@ -1302,44 +1342,31 @@ ul.woocommerce-info {
         padding: 16px 20px 32px !important;
         box-sizing: border-box !important;
     }
-}
-/* 隱藏 WooCommerce 原生結果數量（改用自製篩選器顯示）*/
-form.woocommerce-ordering {
-    display: none !important;
-}
-form.woocommerce-ordering { display: none !important; }
-.woocommerce-result-count { display: none !important; }
 
-/* 水色雲間商品列表置中 */
-.woocommerce-shop .woocommerce-products-header,
-.woocommerce-shop .woocommerce-breadcrumb {
-    text-align: center !important;
-    padding-left: 0 !important;
-}
-/* sidebar 縮小到 200px */
-@media (min-width: 922px) {
-    #ts-cf-sidebar {
-        width: 200px !important;
-        border-bottom: none !important;
+    /* 商品區全寬 */
+    #primary {
+        order: 2 !important;
+        width: 100% !important;
+        float: none !important;
+        max-width: 100% !important;
     }
-    .woocommerce-shop #page .site-content,
-    .woocommerce-shop .ast-container {
-        padding-left: 200px !important;
-    }
-    .woocommerce ul.products.columns-3 {
-        grid-template-columns: repeat(3, 1fr) !important;
-    }
-}
-.woocommerce ul.products li.product a img {
-    height: 280px !important;
-    object-fit: cover !important;
-    object-position: top center !important;
-}
 
-@media (min-width: 922px) {
-    .woocommerce-shop .ast-container {
-        max-width: 1400px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+    /* 關閉按鈕寬度保護 */
+    #ts-filter-close-btn {
+        max-width: calc(100vw - 40px) !important;
+    }
+
+    /* 商品列表：2欄 */
+    .woocommerce ul.products,
+    .woocommerce ul.products.columns-3,
+    .woocommerce ul.products.columns-4 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    /* 商品圖片高度縮小 */
+    .woocommerce ul.products li.product a img {
+        height: 200px !important;
     }
 }

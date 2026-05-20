@@ -1,9 +1,11 @@
 # 天上人間 · 網站建置記憶檔 CLAUDE.md
+
 > 最後更新：2026-05-20
 
 ---
 
 ## 網站基本資訊
+
 - **網址**：https://demo.megeve168.com
 - **後台**：https://demo.megeve168.com/wp-admin
 - **佈景主題**：Astra 4.13.1（免費版）
@@ -16,6 +18,7 @@
 ---
 
 ## 資料庫資訊
+
 - **資料庫名稱**：sql_demo_megeve1
 - **資料表前綴**：wp_730c2d_
 - **重要資料表**：
@@ -30,13 +33,15 @@
 ## 網站架構
 
 ### 主選單（由左至右）
+
 首頁 | 水色雲間 | 水色外送 | 水色定點 | 桃源手記 | 青羚報音 | 紙鳶寄情
 
 ### 頁面對應
+
 | 頁面名稱 | URL | 說明 |
 |---------|-----|------|
 | 首頁 | / | Elementor 編輯，自訂 HTML+CSS 區塊 |
-| 水色雲間 | /shop/ | WooCommerce 商店頁，商品列表+HUSKY篩選 |
+| 水色雲間 | /shop/ | WooCommerce 商店頁，商品列表+自製篩選器 |
 | 水色外送 | /waiso/ | Elementor 頁面，顯示外送茶商品 |
 | 水色定點 | /dingdian/ | Elementor 頁面，顯示定點茶商品 |
 | 桃源手記 | /category/taoyuan/ | 文章分類頁 |
@@ -48,6 +53,7 @@
 ## 商品（WooCommerce Products）
 
 ### 現有商品
+
 | 商品名稱 | Post ID | ACF service_type | 縣市 | product_cat |
 |---------|---------|-----------------|------|-------------|
 | 月柔 | 205 | 外送+定點 | 高雄市（鼓山區） | ⭐ 外送茶, ⭐ 定點茶, 高雄市, 鼓山區 |
@@ -55,12 +61,14 @@
 | 如雪 | 267 | 定點茶 | 台中市（太平區） | ⭐ 定點茶, 台中市, 太平區 |
 
 ### 頁面顯示結果
+
 - **水色外送**（/waiso/）：月柔 + 嫣然 ✅
 - **水色定點**（/dingdian/）：月柔 + 如雪 ✅
 - **首頁水色外送區塊**：嫣然 + 月柔 ✅
 - **首頁水色定點區塊**：如雪 + 月柔 ✅
 
 ### 商品 ACF 欄位
+
 - `nationality`：國籍
 - `age`：年齡
 - `height`：身高
@@ -72,11 +80,13 @@
 - `discount`：優惠方案
 
 ### ⚠️ 服務類型的資料結構
+
 1. **ACF 欄位** `service_type`：「外送茶」「定點茶」「外送+定點」
 2. **WooCommerce Attribute** `pa_service-type`：HUSKY 篩選器用的
 3. **商品分類** `product_cat`：slug `waiso`（2140）/ `dingdian`（2141）
 
 ### ACF 下拉選項值（已統一為中文）
+
 ```
 外送茶 : 外送茶
 定點茶 : 定點茶
@@ -84,6 +94,7 @@
 ```
 
 ### 商品分類 term_taxonomy_id
+
 - ⭐ 外送茶：slug `waiso`，**2140**
 - ⭐ 定點茶：slug `dingdian`，**2141**
 - 台北市：164 / 信義區：171
@@ -94,6 +105,7 @@
 ## 水色外送 / 水色定點 頁面
 
 ### ⚠️ Shortcode 格式（必用 category=，不可用 tag=）
+
 ```
 [products limit="12" category="waiso" columns="3"]
 [products limit="12" category="dingdian" columns="3"]
@@ -116,6 +128,7 @@
 | 09-shop-city-banner.php | 水色雲間縣市 Banner |
 
 ### 重要 Shortcodes
+
 - `[ts_products_by_service type="外送茶" limit="4"]`：首頁外送茶（OR meta_query，含外送+定點）
 - `[ts_products_by_service type="定點茶" limit="4"]`：首頁定點茶（OR meta_query，含外送+定點）
 - `[ts_city_count]`：縣市商品數量導航
@@ -128,62 +141,59 @@
 完整整理版：`tianshang-style.css`（共 15 個區塊）
 分類版本：`css/` 資料夾（GitHub 管理用）
 
-### CSS 區塊 4：Header 控制邏輯
+### CSS 區塊說明
+
+| 區塊 | 內容 |
+|------|------|
+| 1 | 全站基礎樣式、字型、選單顏色 |
+| 2 | 頁尾 |
+| 3 | 首頁 |
+| 4 | 手機選單 Header 控制（斷點 922px） |
+| 5 | 水色雲間商品卡片 & HUSKY 篩選器深色主題 |
+| 6 | Archive 標題白邊消滅 |
+| 7 | 媒合（matches）列表頁 |
+| 8 | 媒合單篇內頁 |
+| 9 | 城市 archive |
+| 10 | 桃源手記 & 青羚報音分類列表 |
+| 11 | 單篇文章內頁 |
+| 12 | 首頁 ts-* 元件 |
+| 13 | 動畫 & 雜項修正 |
+| 14 | WooCommerce 單一商品頁 |
+| 15 | Shop 版面 & RWD（桌機/手機響應式） |
+
+### CSS 區塊 4：Header 斷點邏輯
+
 ```css
 /* 桌機版（922px以上）：顯示桌機 header，隱藏手機 header */
 @media (min-width: 922px) {
     .ast-mobile-header-wrap { display: none !important; }
     .ast-primary-header-bar { display: block !important; }
 }
-
 /* 手機版（921px以下）：顯示手機 header */
 @media (max-width: 921px) {
-    /* ⚠️ 不可加 .ast-primary-header-bar { display: none } */
-    /* 漢堡按鈕在 mobile-header-wrap 裡的 primary-header-bar 內 */
     .ast-mobile-header-wrap {
         display: flex !important;
-        z-index: 99999 !important;
         min-height: 60px !important;
-        align-items: center !important;
+        /* ⚠️ 不可加 .ast-primary-header-bar { display: none } */
     }
 }
 ```
 
-### CSS 區塊 15：手機版 Shop 頁面
+### CSS 區塊 15：Shop RWD 核心邏輯
+
 ```css
+/* 桌機：sidebar absolute 定位 + #primary padding-left */
+@media (min-width: 922px) {
+    .woocommerce-shop .ast-container { max-width: 1200px; position: relative; }
+    .woocommerce-shop #primary { padding-left: 236px; }
+    #ts-cf-sidebar { position: absolute; left: 0; width: 220px; }
+}
+
+/* 手機：sidebar 隱藏，開啟時 position: fixed 浮層，商品 2 欄 */
 @media (max-width: 921px) {
-    .ts-shop-hero { display: none !important; }
-    #secondary {
-        display: none !important;
-        order: 1 !important;
-        width: 100% !important;
-        float: none !important;
-        max-width: 100% !important;
-    }
-    #secondary.ts-open { display: block !important; }
-    #primary {
-        order: 2 !important;
-        width: 100% !important;
-        float: none !important;
-        max-width: 100% !important;
-    }
-    body #secondary.ts-open {
-        position: fixed !important;
-        top: 60px !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-        min-width: 0 !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        z-index: 9995 !important;
-        background: rgba(10, 1, 24, 0.96) !important;
-        border-bottom: 1px solid rgba(255, 138, 178, 0.3) !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-        padding: 16px 20px 32px !important;
-        box-sizing: border-box !important;
-    }
+    #secondary { display: none; }
+    #secondary.ts-open { display: block; position: fixed; top: 60px; }
+    .woocommerce ul.products { grid-template-columns: repeat(2, 1fr); }
 }
 ```
 
@@ -192,10 +202,10 @@
 ## 首頁架構
 
 ```
-區塊① 縣市導航     [ts_city_count]
-區塊② 水色外送     [ts_products_by_service type="外送茶" limit="4"]
-區塊③ 水色定點     [ts_products_by_service type="定點茶" limit="4"]
-區塊⑤ 最新動態     [ts_latest_news limit="4"] + 桃源手記固定連結
+區塊① 縣市導航 [ts_city_count]
+區塊② 水色外送 [ts_products_by_service type="外送茶" limit="4"]
+區塊③ 水色定點 [ts_products_by_service type="定點茶" limit="4"]
+區塊⑤ 最新動態 [ts_latest_news limit="4"] + 桃源手記固定連結
 區塊⑥ 浮世千帆詩句
 區塊⑦ 山中無甲子詩句
 ```
@@ -203,8 +213,74 @@
 踏雲尋境 CTA 已移除。
 
 ### 首頁 HTML 結構重點
+
 - 商品卡片：`section.ts-section` → `div.ts-product-grid` → `a.ts-product-card`
 - **不是** `ul.products li.product`
+
+---
+
+## functions.php 自定義內容（最新版）
+
+完整程式碼在 GitHub：`functions.php`
+
+### 三個主要函數
+
+1. `tianshang_auto_short_desc` — 水色雲間商品簡短說明（ACF 欄位轉 HTML）
+2. `ts_mobile_menu_output` — 手機選單（wp_body_open hook）含「選擇地區」18縣市 tab
+3. `ts_mobile_filter_btn` — 水色雲間手機篩選按鈕（wp_footer hook）
+
+### ⚠️ 手機篩選按鈕插入位置
+
+`ts_mobile_filter_btn` 的 JS 插入目標要用：
+```javascript
+var productGrid = document.querySelector('.woocommerce-products-header, ul.products, .woocommerce-breadcrumb');
+if(productGrid && productGrid.parentNode){
+    productGrid.parentNode.insertBefore(btn, productGrid);
+} else {
+    var primary = document.getElementById('primary');
+    if(primary) primary.insertBefore(btn, primary.firstChild);
+}
+```
+（不可用 `.woocommerce-ordering` 或 `.woocommerce-result-count`，因為已用 CSS 隱藏）
+
+---
+
+## /shop 頁面設定
+
+- WooCommerce 商店頁面設定指向「水色雲間」
+- 篩選器用自製 `#ts-cf-sidebar`（`position: absolute`，寬 220px）
+- 桌機版：sidebar 左側 absolute + `#primary padding-left: 236px`
+- 手機版：sidebar 隱藏，點篩選按鈕展開 `position: fixed` 浮層
+- 縣市 banner 用 `woocommerce_before_main_content` hook 輸出
+- 手機版：縣市 banner 隱藏（`.ts-shop-hero { display: none }`）
+
+### ⚠️ Sidebar 定位關鍵
+
+- `.woocommerce-shop .ast-container` 必須設 `position: relative`
+- `#ts-cf-sidebar` 用 `position: absolute; left: 0`，**不用** `left: calc(50% - 600px)`
+- 桌機版不顯示 `#ts-filter-btn`、`#ts-filter-close-btn`、`#ts-filter-overlay`
+
+---
+
+## Astra Header Builder 設定
+
+### 桌機版
+
+- 第二列（主要頁首）：網站標題及標誌 + 主要選單
+- 可見度：桌機 ✅ 平板 ✅ 手機 ✅（靠 CSS media query 控制）
+
+### 手機版
+
+- OFF CANVAS：Social
+- 第二列：網站標題及標誌 + 切換按鈕
+- 可見度：手機 ✅ 桌機 ✅（靠 CSS media query 控制）
+
+### ⚠️ 重要限制
+
+- Astra 免費版的切換按鈕 JS 不觸發
+- 漢堡按鈕選擇器：`button.ast-mobile-menu-trigger-minimal`
+- 手機 header 元素：`.ast-mobile-header-wrap`
+- ⚠️ `.ast-primary-header-bar` 存在於 `.ast-mobile-header-wrap` 內部，不可用 CSS 隱藏它
 
 ---
 
@@ -236,18 +312,25 @@
 24. G罩杯以上 → str_replace 順序修正，G+ 正確對應
 25. 確認篩選後外部標籤列 → 面板外顯示已選條件，可點 ✕ 取消
 26. 手機選單選擇地區 → 18縣市跳 product-category 分類頁
+27. 桌機版 /shop 置中（sidebar + 商品區對稱留白） → `position: absolute` sidebar + `padding-left: 236px` ✅
+28. /shop 桌機版 sidebar 框線 → 設為 `border: none; background: transparent` ✅
+29. 手機版商品列表改為 2 欄 → `grid-template-columns: repeat(2, 1fr)` ✅
+30. 手機版水平捲動 → `html, body { overflow-x: hidden }` ✅
+31. CSS 區塊 15 重複 media query 整理 → 合併為單一桌機/手機區塊 ✅
 
 ---
 
 ## 手機選單（已解決）
 
 ### 解法
+
 - `wp_body_open` hook 輸出 `#ts-mob-overlay` + `#ts-mob-menu`
 - JS 綁定 `button.ast-mobile-menu-trigger-minimal` 的 click 事件
 - 樣式：從上往下展開（`display: block`），不是側滑
 - 程式碼在 **functions.php** 的 `ts_mobile_menu_output` 函數
 
 ### ⚠️ 重要：為何用 wp_body_open 而非 wp_footer
+
 - `wp_footer` 輸出的 HTML 被 emoji JS 腳本字串包住，`getElementById` 回傳 null
 - `wp_body_open` 在 `<body>` 開頭輸出，DOM 正常
 
@@ -256,73 +339,34 @@
 ## 水色雲間手機版篩選（已解決）
 
 ### 解法
+
 - `wp_footer` hook 輸出 `#ts-filter-btn` + `#ts-filter-close-btn` + `#ts-filter-overlay`
 - CSS 預設 `#secondary { display: none !important }`
 - 點擊篩選按鈕 → `sidebar.classList.add('ts-open')` + overlay 顯示 + 關閉按鈕顯示
 - `#secondary.ts-open` 用 `position: fixed` 浮在商品上方
 - 關閉按鈕固定在畫面底部中央
 
-### ⚠️ HUSKY 限制
-- HUSKY AJAX 篩選需要 `#secondary` 在原本 DOM 位置
-- 不可移動 `#secondary` 的 DOM（`appendChild`、`insertBefore` 都會讓商品消失）
-- 不可用 `display: none` 在 CSS 隱藏 `.sidebar-main`（HUSKY 初始化需要它可見）
-- 正確做法：CSS `display:none` 隱藏整個 `#secondary`，JS 切換 `ts-open` class
+### ⚠️ 篩選按鈕插入目標
 
-### ⚠️ Astra flex-direction 覆蓋問題
-- Astra CSS 會把 `.ast-container` 強制設為 `flex-direction: row`
-- CSS `!important` 無法覆蓋
-- 解法：用 JS `element.style.setProperty('flex-direction', 'column', 'important')`
-- 但 `position: fixed` 後 sidebar 脫離文件流，不需要 flex-direction
+不可用 `.woocommerce-ordering` 或 `.woocommerce-result-count`（已 CSS 隱藏），改用：
+```javascript
+document.querySelector('.woocommerce-products-header, ul.products, .woocommerce-breadcrumb')
+```
 
 ---
 
-## Astra Header Builder 設定
+## RWD 響應式確認（2026-05-20）
 
-### 桌機版
-- 第二列（主要頁首）：網站標題及標誌 + 主要選單
-- 可見度：桌機 ✅ 平板 ✅ 手機 ✅（靠 CSS media query 控制）
-
-### 手機版
-- OFF CANVAS：Social
-- 第二列：網站標題及標誌 + 切換按鈕
-- 可見度：手機 ✅ 桌機 ✅（靠 CSS media query 控制）
-
-### ⚠️ 重要限制
-- Astra 免費版的切換按鈕 JS 不觸發
-- 漢堡按鈕選擇器：`button.ast-mobile-menu-trigger-minimal`
-- 手機 header 元素：`.ast-mobile-header-wrap`（computed display: flex ✅）
-- ⚠️ `.ast-primary-header-bar` 存在於 `.ast-mobile-header-wrap` 內部，不可用 CSS 隱藏它
-
----
-
-## functions.php 自定義內容（最新版）
-
-完整程式碼在 GitHub：`functions.php`
-
-### 三個主要函數
-1. `tianshang_auto_short_desc` — 水色雲間商品簡短說明（ACF 欄位轉 HTML）
-2. `ts_mobile_menu_output` — 手機選單（wp_body_open hook）
-3. `ts_mobile_filter_btn` — 水色雲間手機篩選按鈕（wp_footer hook）
-
----
-
-## /shop 頁面設定
-- WooCommerce 商店頁面設定指向「水色雲間」
-- 篩選器用 HUSKY，透過 Astra sidebar 顯示
-- 縣市 banner 用 `woocommerce_before_main_content` hook 輸出
-- 手機版：縣市 banner 隱藏，改用篩選按鈕浮層
-
----
-
-## 待辦事項
-- [x] 水色雲間桌機版左側篩選 bar ✅
-- [x] 篩選器加國旗顯示 ✅
-- [x] G+ 罩杯支援 ✅
-- [x] 確認篩選後外部顯示條件標籤 ✅
-- [x] 重置功能 ✅
-- [x] 隱藏 WooCommerce 預設排序和結果數量 ✅
-- [x] 手機選單加「選擇地區」18縣市 tab ✅
-- [ ] 桌機版版面置中（sidebar + 商品區對稱留白）← 進行中
+| 頁面 | 電腦版 | 手機版 | 備註 |
+|------|--------|--------|------|
+| 首頁 / | ✅ | ✅ | Elementor，viewport 正常 |
+| 水色雲間 /shop/ | ✅ | ✅ | 桌機3欄/手機2欄，sidebar 正常 |
+| 水色外送 /waiso/ | ✅ | ✅ | Elementor |
+| 水色定點 /dingdian/ | ✅ | ✅ | Elementor |
+| 桃源手記 /category/taoyuan/ | ✅ | ✅ | 3欄→2欄→1欄 斷點 992/600px |
+| 青羚報音 /category/news/ | ✅ | ✅ | 同上 |
+| 紙鳶寄情 /about/ | ✅ | ✅ | Elementor |
+| 單一商品內頁 | ✅ | ✅ | max-width 限制正常 |
 
 ---
 
@@ -365,7 +409,7 @@ WHERE t.slug = 'waiso' AND p.post_type = 'product' AND p.post_status = 'publish'
 
 ```
 tianshang-website/
-├── CLAUDE.md
+├── project-notes.txt
 ├── functions.php
 ├── tianshang-style.css
 ├── css/
@@ -389,16 +433,33 @@ tianshang-website/
 
 ---
 
+## 待辦事項
+
+- [x] 水色雲間桌機版左側篩選 bar ✅
+- [x] 篩選器加國旗顯示 ✅
+- [x] G+ 罩杯支援 ✅
+- [x] 確認篩選後外部顯示條件標籤 ✅
+- [x] 重置功能 ✅
+- [x] 隱藏 WooCommerce 預設排序和結果數量 ✅
+- [x] 手機選單加「選擇地區」18縣市 tab ✅
+- [x] 桌機版版面置中（sidebar + 商品區對稱留白）✅
+- [x] sidebar 框線移除 ✅
+- [x] 手機版商品 2 欄 ✅
+- [x] RWD 全站確認 ✅
+- [ ] 新增更多商品資料
+
+---
+
 ## 每次開新對話貼這些 URL
 
 ```
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/CLAUDE.md
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/functions.php
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/tianshang-style.css
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/01-match-card.php
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/02-taoyuan-notes.php
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/03-explore.php
-https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/04-news.php
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/project-notes.txt
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/functions.php
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/tianshang-style.css
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/snippets/01-match-card.php
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/snippets/02-taoyuan-notes.php
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/snippets/03-explore.php
+https://raw.githubusercontent.com/dodo997447/tianshang-website/main/snippets/04-news.php
 https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/05-homepage-shortcode.php
 https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/06-homepage-featured.php
 https://raw.githubusercontent.com/dodo997444/tianshang-website/main/snippets/07-shop-city-display.php
