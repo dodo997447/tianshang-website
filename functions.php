@@ -248,31 +248,69 @@ function tianshang_auto_short_desc($content) {
     return $html;
 }
  
-// ============================================================
-// 天上人間－手機選單
-// ============================================================
+// 天上人間－手機選單（含選擇地區 18縣市）
 add_action('wp_body_open', 'ts_mobile_menu_output');
-function ts_mobile_menu_output() { ?>
+function ts_mobile_menu_output() { 
+    $cities = [
+        ['name' => '台北市', 'slug' => 'taipei-city'],
+        ['name' => '新北市', 'slug' => 'new-taipei-city'],
+        ['name' => '桃園市', 'slug' => 'taoyuan-city'],
+        ['name' => '台中市', 'slug' => 'taichung-city'],
+        ['name' => '台南市', 'slug' => 'tainan-city'],
+        ['name' => '高雄市', 'slug' => 'kaohsiung-city'],
+        ['name' => '基隆市', 'slug' => 'keelung-city'],
+        ['name' => '新竹市', 'slug' => 'hsinchu-city'],
+        ['name' => '苗栗縣', 'slug' => 'miaoli-county'],
+        ['name' => '彰化縣', 'slug' => 'changhua-county'],
+        ['name' => '南投縣', 'slug' => 'nantou-county'],
+        ['name' => '雲林縣', 'slug' => 'yunlin-county'],
+        ['name' => '嘉義市', 'slug' => 'chiayi-city'],
+        ['name' => '屏東縣', 'slug' => 'pingtung-county'],
+        ['name' => '宜蘭縣', 'slug' => 'yilan-county'],
+        ['name' => '花蓮縣', 'slug' => 'hualien-county'],
+        ['name' => '台東縣', 'slug' => 'taitung-county'],
+        ['name' => '澎湖縣', 'slug' => 'penghu-county'],
+    ];
+?>
 <div id="ts-mob-overlay"></div>
 <div id="ts-mob-menu">
-    <ul>
-        <li><a href="/">首頁</a></li>
-        <li><a href="/shop/">水色雲間</a></li>
-        <li><a href="/waiso/">水色外送</a></li>
-        <li><a href="/dingdian/">水色定點</a></li>
-        <li><a href="/category/taoyuan/">桃源手記</a></li>
-        <li><a href="/category/news/">青羚報音</a></li>
-        <li><a href="/about/">紙鳶寄情</a></li>
-    </ul>
+    <div id="ts-mob-tabs">
+        <button class="ts-mob-tab ts-mob-tab-active" data-tab="menu">選單</button>
+        <button class="ts-mob-tab" data-tab="region">選擇地區</button>
+    </div>
+    <div id="ts-mob-tab-menu" class="ts-mob-tab-content ts-mob-tab-content-active">
+        <ul>
+            <li><a href="/">首頁</a></li>
+            <li><a href="/shop/">水色雲間</a></li>
+            <li><a href="/waiso/">水色外送</a></li>
+            <li><a href="/dingdian/">水色定點</a></li>
+            <li><a href="/category/taoyuan/">桃源手記</a></li>
+            <li><a href="/category/news/">青羚報音</a></li>
+            <li><a href="/about/">紙鳶寄情</a></li>
+        </ul>
+    </div>
+    <div id="ts-mob-tab-region" class="ts-mob-tab-content">
+        <ul class="ts-mob-city-list">
+            <?php foreach ($cities as $city): ?>
+            <li>
+                <a href="/product-category/<?php echo esc_attr($city['slug']); ?>/">
+                    <span><?php echo esc_html($city['name']); ?></span>
+                    <span class="ts-mob-city-arrow">›</span>
+                </a>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    var menu = document.getElementById('ts-mob-menu');
+    var menu    = document.getElementById('ts-mob-menu');
     var overlay = document.getElementById('ts-mob-overlay');
+
     function openMenu(){ overlay.style.display='block'; menu.style.display='block'; }
     function closeMenu(){ overlay.style.display='none'; menu.style.display='none'; }
+
     var toggleBtn = document.querySelector('button.ast-mobile-menu-trigger-minimal');
-    console.log('ts-menu init, btn:', toggleBtn);
     if(toggleBtn){
         toggleBtn.addEventListener('click', function(e){
             e.stopPropagation();
@@ -280,18 +318,103 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
     overlay.addEventListener('click', closeMenu);
+
+    // Tab 切換
+    document.querySelectorAll('.ts-mob-tab').forEach(function(tab){
+        tab.addEventListener('click', function(){
+            document.querySelectorAll('.ts-mob-tab').forEach(function(t){ t.classList.remove('ts-mob-tab-active'); });
+            document.querySelectorAll('.ts-mob-tab-content').forEach(function(c){ c.classList.remove('ts-mob-tab-content-active'); });
+            this.classList.add('ts-mob-tab-active');
+            document.getElementById('ts-mob-tab-' + this.dataset.tab).classList.add('ts-mob-tab-content-active');
+        });
+    });
 });
 </script>
 <style>
-#ts-mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99998;}
-#ts-mob-menu{display:none;position:fixed;top:60px;left:0;right:0;background:#0A0118;z-index:99999;border-bottom:1px solid rgba(255,138,178,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-#ts-mob-menu ul{list-style:none;padding:0;margin:0;}
-#ts-mob-menu ul li{border-bottom:0.5px solid rgba(200,162,255,0.1);}
-#ts-mob-menu ul li a{display:block;padding:16px 24px;color:#E0CFFF!important;font-size:16px;letter-spacing:3px;text-decoration:none;font-family:'Noto Serif TC',serif;}
-#ts-mob-menu ul li a:hover{color:#FF8AB2!important;}
+#ts-mob-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 99998;
+}
+#ts-mob-menu {
+    display: none;
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    background: #0A0118;
+    z-index: 99999;
+    border-bottom: 1px solid rgba(255,138,178,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    max-height: 60vh;    /* 加這行，只佔60%視窗高度 */
+    overflow-y: auto;    /* 確保這行存在 */
+}
+#ts-mob-tabs {
+    display: flex;
+    border-bottom: 0.5px solid rgba(255,138,178,0.2);
+    position: sticky;
+    top: 0;
+    background: #0A0118;
+    z-index: 2;
+}
+.ts-mob-tab {
+    flex: 1;
+    padding: 14px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgba(224,207,255,0.5);
+    font-size: 14px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+}
+.ts-mob-tab-active {
+    color: #FF8AB2 !important;
+    border-bottom-color: #FF8AB2 !important;
+}
+.ts-mob-tab-content { display: none; }
+.ts-mob-tab-content-active { display: block; }
+
+/* 選單列表 */
+#ts-mob-tab-menu ul { list-style: none; padding: 0; margin: 0; }
+#ts-mob-tab-menu ul li { border-bottom: 0.5px solid rgba(200,162,255,0.1); }
+#ts-mob-tab-menu ul li a {
+    display: block;
+    padding: 16px 24px;
+    color: #E0CFFF !important;
+    font-size: 16px;
+    letter-spacing: 3px;
+    text-decoration: none;
+    font-family: 'Noto Serif TC', serif;
+}
+#ts-mob-tab-menu ul li a:hover { color: #FF8AB2 !important; }
+
+/* 地區列表 */
+.ts-mob-city-list { list-style: none; padding: 0; margin: 0; }
+.ts-mob-city-list li { border-bottom: 0.5px solid rgba(200,162,255,0.1); }
+.ts-mob-city-list li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;  /* 從 16px 改成 10px */
+    color: #E0CFFF !important;
+    font-size: 14px;     /* 從 15px 改成 14px */
+    letter-spacing: 2px;
+    text-decoration: none;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: all 0.2s;
+}
+.ts-mob-city-list li a:hover {
+    color: #FF8AB2 !important;
+    background: rgba(255,138,178,0.05);
+}
+.ts-mob-city-arrow {
+    color: rgba(200,162,255,0.4);
+    font-size: 20px;
+}
 </style>
 <?php }
- 
 // ============================================================
 // 水色雲間－手機篩選按鈕
 // ============================================================
